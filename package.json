@@ -1,0 +1,38 @@
+{
+  "name": "signal-store",
+  "version": "0.0.1",
+  "description": "",
+  "scripts": {
+    "build": "qoi build --dts --emptyOutDir",
+    "test": "vitest",
+    "coverage": "vitest run --coverage --reporter=junit --outputFile=coverage/test-coverage.xml"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aelbore/signal-store.git"
+  },
+  "keywords": [
+    "signal",
+    "store"
+  ],
+  "author": "Arjay Elbore <aelbore.sg@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/aelbore/signal-store/issues"
+  },
+  "homepage": "https://github.com/aelbore/signal-store#readme",
+  "devDependencies": {
+    "@qoi/build": "^0.2.3",
+    "@qoi/cli": "^0.2.3",
+    "@qoi/types": "^0.0.8",
+    "@rollup/pluginutils": "^5.0.0",
+    "@vitest/coverage-c8": "^0.24.1",
+    "happy-dom": "^7.5.7",
+    "rollup-plugin-dts": "^4.2.3",
+    "tsconfig-paths": "^4.1.0",
+    "typescript": "^4.8.4",
+    "usignal": "^0.8.1",
+    "vite": "^3.1.7",
+    "vitest": "^0.24.1"
+  }
+}
