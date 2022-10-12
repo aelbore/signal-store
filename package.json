@@ -21,6 +21,9 @@
     "url": "https://github.com/aelbore/signal-store/issues"
   },
   "homepage": "https://github.com/aelbore/signal-store#readme",
+  "peerDependencies": {
+    "usignal": "^0.8.1"
+  },
   "devDependencies": {
     "@qoi/build": "^0.2.3",
     "@qoi/cli": "^0.2.3",
