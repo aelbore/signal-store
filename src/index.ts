@@ -4,7 +4,7 @@ import { Action, Actions, Getters, Store, StoreOptions } from './types'
 export * from './types'
 
 function createGetters<S, G>(state: S, gets: Getters<S, G>) {
-  return Object.keys(gets || {}).reduce((p, c) => {
+  return Object.keys(gets).reduce((p, c) => {
     p[c] = computed(() => gets[c](state))
     return p
   }, {} as  {
@@ -38,7 +38,7 @@ function createActions<S, G, A>(state: S, getters: Getters<S, G>, actions: Actio
 }
 
 export function createStore<S, G, A>(options: StoreOptions<S, G, A>) {
-  const { state, getters, actions } = options
+  const { state, getters = {}, actions = {}} = options
   const states = createStateSignals(state)  
   return { 
     ...createGetters(states, getters), 
