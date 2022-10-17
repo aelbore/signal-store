@@ -1,18 +1,5 @@
-import { Signal, signal } from 'usignal'
+import { signal } from 'usignal'
 import { createStore } from './index'
-
-export type State = { name?: Signal<string> }
-
-export interface Product {
-  id?: string
-  title?: string
-  price?: number
-  quantity?: number
-}
-
-export interface ProductState {
-  products?: Signal<Product[]>
-}
 
 describe('Store', () => { 
 
@@ -28,18 +15,18 @@ describe('Store', () => {
         name: signal('')
       }, 
       getters: {
-        name(state: State) {
+        name(state) {
           return state.name.value
         }
       }, 
       actions: {
-        setName(state: State, payload: string) { 
+        setName({ state }, payload: string) { 
           state.name.value = payload
         }
       }
     })
 
-    store.dispatch('setName', name)
+    store.setName(name)
     expect(store.name.value).toStrictEqual(name)
   })
 
@@ -47,7 +34,7 @@ describe('Store', () => {
     const name = 'Jane'
 
     const actions = {
-      setName(state: State, payload: string) { }
+      setName({ state }, payload: string) { }
     }
 
     const onSetName = vi.spyOn(actions, 'setName')
@@ -61,7 +48,7 @@ describe('Store', () => {
       }
     })
 
-    store.dispatch('setName', name)
+    store.setName(name)
     expect(onSetName).toHaveBeenCalledTimes(1)
   })
 
@@ -69,7 +56,7 @@ describe('Store', () => {
     const name = 'Jane'
 
     const getters = {
-      name(state: State) {
+      name(state) {
         return state.name.value
       }
     }
@@ -84,20 +71,26 @@ describe('Store', () => {
         name: getters.name
       },
       actions: {
-        setName(state: State, payload: string) {
+        setName({ state }, payload: string) {
           state.name.value = payload
         }
       }
     })
 
-    store.dispatch('setName', name)
+    store.setName(name)
 
     expect(store.name.value).toStrictEqual(name)
     expect(onGetName).toHaveBeenCalledTimes(1)
   })
 
   it('should computed', () => {
-
+     type Product = {
+      id?: string
+      title?: string
+      price?: number
+      quantity?: number
+    }
+    
     const store = createStore({
       state: {
         products: signal<Product[]>([
@@ -106,17 +99,17 @@ describe('Store', () => {
         ])
       }, 
       getters: {
-        totalQuantity(state: ProductState) {
+        totalQuantity(state) {
           return state.products.value.reduce((p, c) => {
             return p + c.quantity
           }, 0)
         },
-        products(state: ProductState) {
+        products(state) {
           return state.products.value
         }
       },
       actions: {
-        addToCart(state: ProductState, payload: Product) {
+        addToCart({ state }, payload: Product) {
           const products = [ ...state.products.value ]
           const index = products.findIndex(c => c.id === payload.id)
           if (index !== -1) {
@@ -126,13 +119,37 @@ describe('Store', () => {
           }
           state.products.value = [ ...products ]
         }
-      }
+      } 
     })
 
-    store.dispatch('addToCart', { id: 'p1', title: 'Gaming Mouse', price: 29.99 })
+    store.addToCart({ id: 'p1', title: 'Gaming Mouse', price: 29.99 })
 
     expect(store.totalQuantity.value).toStrictEqual(2)
     expect(store.products.value.find(p => p.id === 'p1').quantity).toStrictEqual(1)
   })
 
+  it('should dispatch inside action', () => {
+    const name = 'Jane'
+
+    const actions = {
+      getName({ state, dispatch }, payload: string) { }
+    }
+
+    const onGetName = vi.spyOn(actions, 'getName')
+
+    const store = createStore({
+      state: {
+        name: signal('')
+      }, 
+      actions: {
+        setName({ dispatch }, payload: string) { 
+          dispatch('getName', payload)
+        },
+        getName: actions.getName
+      }
+    })
+
+    store.setName(name)
+    expect(onGetName).toHaveBeenCalledTimes(1)
+  })
 })
