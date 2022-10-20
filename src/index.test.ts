@@ -109,7 +109,7 @@ describe('Store', () => {
         }
       },
       actions: {
-        addToCart({ state }, payload: Product) {
+        addToCart({ state, getters }, payload: Product) {
           const products = [ ...state.products.value ]
           const index = products.findIndex(c => c.id === payload.id)
           if (index !== -1) {

@@ -1,5 +1,5 @@
 import { computed, signal, Signal } from 'usignal'
-import { Action, Actions, Getters, Store, StoreOptions } from './types'
+import { Action, Actions, Getters, Store, GettersReadOnly, StoreOptions } from './types'
 
 export * from './types'
 
@@ -14,15 +14,7 @@ function createGetters<S, G>(state: S, gets: Getters<S, G>) {
   })
 }
 
-function createStateSignals<S>(state: S) {
-  return Object.keys(state).reduce((p, c) => {
-    const s = state[c]
-    p[c] = s instanceof Signal ? s: signal<typeof s>(s)
-    return p
-  }, {} as S)
-}
-
-function createActions<S, G, A>(state: S, getters: Getters<S, G>, actions: Actions<S, G, A>) {
+function createActions<S, G, A>(state: S, getters: GettersReadOnly<G>, actions: Actions<S, G, A>) {
   return Object.keys(actions).reduce((p, c) => {
     p[c] = <T>(payload?: T) => {
       actions[c]?.({ 
@@ -37,11 +29,20 @@ function createActions<S, G, A>(state: S, getters: Getters<S, G>, actions: Actio
   }, {} as Action<A>)
 }
 
+export function createStateSignals<S>(state: S) {
+  return Object.keys(state).reduce((p, c) => {
+    const s = state[c]
+    p[c] = s instanceof Signal ? s: signal<typeof s>(s)
+    return p
+  }, {} as S)
+}
+
 export function createStore<S, G, A>(options: StoreOptions<S, G, A>) {
   const { state, getters = {}, actions = {}} = options
   const states = createStateSignals(state)  
+  const getters$ = createGetters(states, getters)
   return { 
-    ...createGetters(states, getters), 
-    ...createActions(states, getters, actions)
+    ...getters$, 
+    ...createActions(states, getters$, actions)
   } as Store<G, A>
 }
