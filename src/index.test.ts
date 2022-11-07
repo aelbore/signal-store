@@ -17,6 +17,9 @@ describe('Store', () => {
       getters: {
         name(state) {
           return state.name.value
+        },
+        fname(state) {
+          return state.name.value
         }
       }, 
       actions: {
@@ -109,7 +112,7 @@ describe('Store', () => {
         }
       },
       actions: {
-        addToCart({ state, getters }, payload: Product) {
+        addToCart({ state }, payload: Product) {
           const products = [ ...state.products.value ]
           const index = products.findIndex(c => c.id === payload.id)
           if (index !== -1) {
@@ -156,22 +159,19 @@ describe('Store', () => {
   it('should access the getters within getters', () => {
     const name = 'Jane'
 
-    const getters = {
-      name(state) {
-        return state.name.value
-      }
-    }
-
-    const onGetName = vi.spyOn(getters, 'name')
-
     const store = createStore({
       state: {
         name: signal('')
       }, 
       getters: {
-        name: getters.name,
+        name(state) {
+          return state.name.value
+        },
         fullname(state, getters) {
-          return state.name.value + ' ' + getters.name.value
+          /// TODO: need to find a way types will not error
+          /// if getters will use direct instead of assign to a variable
+          const name = getters.name.value as string
+          return state.name.value + ' ' + name
         }
       },
       actions: {
@@ -185,7 +185,6 @@ describe('Store', () => {
 
     expect(store.name.value).toStrictEqual(name)
     expect(store.fullname.value).toStrictEqual(name + ' ' + name)
-    expect(onGetName).toHaveBeenCalledTimes(2)
   })
 
 })

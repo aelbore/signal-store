@@ -6,7 +6,10 @@ export type Action<A> = {
 
 export type Actions<S, G, A> = {
   [K in keyof A]: 
-    <V extends Exclude<keyof A, K>, GR extends GettersReadOnly<G>>(
+    <
+      V extends Exclude<keyof A, K>, 
+      GR extends GettersReadOnly<G>
+    >(
         { state, dispatch, getters }: { 
           state: S, 
           getters?: GR,
@@ -19,8 +22,8 @@ export type Actions<S, G, A> = {
 export type Getters<S, G> = {
   [K in keyof G]: 
     <V extends {
-      [X in Exclude<keyof G, K>]: GettersReadOnly<G>[K]
-    }>(
+        [X in Exclude<keyof G, K>]: Readonly<Signal<G[X]>>
+     }>(
       state: S, 
       getters?: V
     ) => G[K]
@@ -29,11 +32,6 @@ export type Getters<S, G> = {
 export type GettersReadOnly<G> = {
   [K in keyof G]: Readonly<Signal<G[K]>>
 }
-
-export type IGettersReadOnly<G, V extends keyof G> = {
-  [K in V]: Readonly<Signal<G[K]>>
-}
-
 
 export interface StoreOptions<S, G, A> {
   state: S
