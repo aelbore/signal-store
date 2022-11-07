@@ -104,7 +104,7 @@ describe('Store', () => {
             return p + c.quantity
           }, 0)
         },
-        products(state) {
+        products(state) {          
           return state.products.value
         }
       },
@@ -152,4 +152,40 @@ describe('Store', () => {
     store.setName(name)
     expect(onGetName).toHaveBeenCalledTimes(1)
   })
+
+  it('should access the getters within getters', () => {
+    const name = 'Jane'
+
+    const getters = {
+      name(state) {
+        return state.name.value
+      }
+    }
+
+    const onGetName = vi.spyOn(getters, 'name')
+
+    const store = createStore({
+      state: {
+        name: signal('')
+      }, 
+      getters: {
+        name: getters.name,
+        fullname(state, getters) {
+          return state.name.value + ' ' + getters.name.value
+        }
+      },
+      actions: {
+        setName({ state }, payload: string) {
+          state.name.value = payload
+        }
+      }
+    })
+
+    store.setName(name)
+
+    expect(store.name.value).toStrictEqual(name)
+    expect(store.fullname.value).toStrictEqual(name + ' ' + name)
+    expect(onGetName).toHaveBeenCalledTimes(2)
+  })
+
 })

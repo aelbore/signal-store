@@ -5,7 +5,7 @@ export * from './types'
 
 function createGetters<S, G>(state: S, gets: Getters<S, G>) {
   return Object.keys(gets).reduce((p, c) => {
-    p[c] = computed(() => gets[c](state))
+    p[c] = computed(() => gets[c](state, createGetters(state, gets)))
     return p
   }, {} as  {
     [K in keyof typeof gets]: Readonly<

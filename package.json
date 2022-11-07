@@ -1,6 +1,6 @@
 {
   "name": "signal-store",
-  "version": "1.0.1",
+  "version": "1.2.0",
   "description": "",
   "type": "module",
   "scripts": {
@@ -23,16 +23,16 @@
   },
   "homepage": "https://github.com/aelbore/signal-store#readme",
   "peerDependencies": {
-    "usignal": "^0.8.1"
+    "usignal": "^0.8.9"
   },
   "devDependencies": {
-    "@vitest/coverage-c8": "^0.24.3",
+    "@vitest/coverage-c8": "^0.24.5",
     "happy-dom": "^7.6.6",
     "minify-html-literals": "^1.3.5",
-    "qoi-cli": "^0.1.0",
+    "qoi-cli": "^0.5.0",
     "typescript": "^4.8.4",
-    "usignal": "^0.8.1",
-    "vite": "^3.2.0",
-    "vitest": "^0.24.3"
+    "usignal": "^0.8.9",
+    "vite": "^3.2.2",
+    "vitest": "^0.24.5"
   }
 }
