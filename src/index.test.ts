@@ -167,7 +167,7 @@ describe('Store', () => {
         name(state) {
           return state.name.value
         },
-        fullname(state, getters) {
+        fullname(state, { getters }) {                  
           /// TODO: need to find a way types will not error
           /// if getters will use direct instead of assign to a variable
           const name = getters.name.value as string
@@ -185,6 +185,81 @@ describe('Store', () => {
 
     expect(store.name.value).toStrictEqual(name)
     expect(store.fullname.value).toStrictEqual(name + ' ' + name)
+  })
+
+  it('should call the core getters modules in store getters', () => {
+    const name = 'Jane'
+    const fname = 'Doe'
+
+    const core = createStore({
+      state: {
+        name: signal(name)
+      },
+      getters: {
+        name(state) {
+          return state.name.value
+        }
+      }
+    })
+
+    const store = createStore({
+      state: {
+        fname: signal('')
+      },
+      modules: {
+        core
+      },
+      getters: {
+        fname(state, { modules }) {          
+          return state.fname.value + ' ' + modules.core.name.value
+        }
+      },
+      actions: {
+        setName({ state }, payload: string) {
+          state.fname.value = payload
+        }
+      }
+    })
+
+    store.setName('Doe')
+    expect(store.fname.value).toStrictEqual(fname + ' ' + name)
+  })
+
+  it('should call the core gettes modules in store actions', () => {
+    const name = 'Jane'
+
+    const core = createStore({
+      state: {
+        name: signal(name)
+      },
+      getters: {
+        name(state) {
+          return state.name.value
+        }
+      }
+    })
+
+    const store = createStore({
+      state: {
+        fname: signal('')
+      },
+      modules: {
+        core
+      },
+      getters: {
+        fname(state) {          
+          return state.fname.value
+        }
+      },
+      actions: {
+        setName({ state, modules }) {
+          state.fname.value = modules.core.name.value
+        }
+      }
+    })
+
+    store.setName(name)
+    expect(store.fname.value).toStrictEqual(name)
   })
 
 })
