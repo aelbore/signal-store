@@ -1,4 +1,4 @@
-import { Signal } from 'usignal'
+import { ReactiveSignal } from 'usignal'
 
 export type Action<A> = {
   [K in keyof A]: <T>(payload?: T) => void
@@ -28,7 +28,7 @@ export type FPropNames<T> = {
 export type Getters<S, G, M> = {
   [K in keyof G]: 
     <
-      V extends { [X in Exclude<keyof G, K>]: Readonly<Signal<G[X]>> },
+      V extends { [X in Exclude<keyof G, K>]: Readonly<ReactiveSignal<G[X]>> },
       X extends {
         [A in keyof Modules<M>]: {
           [B in Exclude<keyof Modules<M>[A], FPropNames<Modules<M>[A]>>]: Modules<M>[A][B]
@@ -44,7 +44,7 @@ export type Getters<S, G, M> = {
 }
 
 export type GettersReadOnly<G> = {
-  [K in keyof G]: Readonly<Signal<G[K]>>
+  [K in keyof G]: Readonly<ReactiveSignal<G[K]>>
 }
 
 export type Modules<M> = {

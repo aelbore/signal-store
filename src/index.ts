@@ -1,4 +1,4 @@
-import { computed, signal, Signal } from 'usignal'
+import { computed, ReactiveSignal, signal, Signal } from 'usignal'
 import { Action, Actions, Getters, Store, GettersReadOnly, StoreOptions, Modules } from './types'
 
 export * from './types'
@@ -18,7 +18,7 @@ function createGetters<S, G, M, A>(
     return p
   }, {} as  {
     [K in keyof typeof gets]: Readonly<
-      Signal<ReturnType<typeof gets[K]>>
+      ReactiveSignal<ReturnType<typeof gets[K]>>
     >
   })
 }
