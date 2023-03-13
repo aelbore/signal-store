@@ -25,6 +25,10 @@ export type FPropNames<T> = {
   [K in keyof T]: T[K] extends Function ? K : never 
 }[keyof T]
 
+export type State<S> = {
+  [T in keyof S]: Readonly<ReactiveSignal<S[T]>>
+}
+
 export type Getters<S, G, M> = {
   [K in keyof G]: 
     <
@@ -35,7 +39,7 @@ export type Getters<S, G, M> = {
         }
       }
     >(
-      state: S, 
+      state?: S & { state?: State<S>, getters?: V, modules?: X  },
       { getters, modules }?: {
         getters?: V,
         modules?: X

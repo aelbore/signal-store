@@ -1,4 +1,4 @@
-import { signal } from 'usignal'
+import { ReactiveSignal, signal } from 'usignal'
 import { createStore } from './index'
 
 describe('Store', () => { 
@@ -210,7 +210,7 @@ describe('Store', () => {
         core
       },
       getters: {
-        fname(state, { modules }) {          
+        fname({ state, modules }) {          
           return state.fname.value + ' ' + modules.core.name.value
         }
       },
@@ -230,7 +230,7 @@ describe('Store', () => {
 
     const core = createStore({
       state: {
-        name: signal(name)
+        name: signal(name),
       },
       getters: {
         name(state) {
@@ -241,13 +241,14 @@ describe('Store', () => {
 
     const store = createStore({
       state: {
-        fname: signal('')
+        fname: signal(''),
+        v: signal(true)
       },
       modules: {
         core
       },
       getters: {
-        fname(state) {          
+        fname({ state }) {          
           return state.fname.value
         }
       },
@@ -262,4 +263,29 @@ describe('Store', () => {
     expect(store.fname.value).toStrictEqual(name)
   })
 
-})
+  it('should call action type', () => {
+    const store = createStore({
+      state: {
+        name: 'Jane',
+        v: signal(true)
+      }, 
+      getters: {
+        name({ state }) {
+          return state.name.value
+        }
+      },
+      actions: {
+        setName({ dispatch }) {
+          dispatch('display')
+        },
+        display() {
+          console.log('hello')
+        }
+      }
+    })
+
+    store.setName()
+    expect(store.name.value).toStrictEqual("Jane")
+  })
+
+}) 

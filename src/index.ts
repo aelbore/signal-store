@@ -3,14 +3,35 @@ import { Action, Actions, Getters, Store, GettersReadOnly, StoreOptions, Modules
 
 export * from './types'
 
-function createGetters<S, G, M, A>(
+function createGetters<S, G, M>(
   state: S, 
   gets: Getters<S, G, M>, 
   modules: Modules<M>
 ) {
   return Object.keys(gets).reduce((p, c) => {
-    p[c] = computed(() => {
+    p[c] = computed(() => {      
       return gets[c](state, {
+        getters: createGetters(state, gets, modules),
+        modules
+      })
+    })
+    return p
+  }, {} as  {
+    [K in keyof typeof gets]: Readonly<
+      ReactiveSignal<ReturnType<typeof gets[K]>>
+    >
+  })
+}
+
+function createGetters$<S, G, M>(
+  state: S, 
+  gets: Getters<S, G, M>, 
+  modules: Modules<M>
+) {
+  return Object.keys(gets).reduce((p, c) => {
+    p[c] = computed(() => {      
+      return gets[c]({
+        state,
         getters: createGetters(state, gets, modules),
         modules
       })
@@ -59,10 +80,10 @@ export function createStateSignals<S>(state: S) {
   }, {} as S)
 }
 
-export function createStore<S, G, A, M>(options: StoreOptions<S, G, A, M>) {
+export function createStore<S, G, A, M>(options: StoreOptions<S & { v?: ReactiveSignal<boolean> }, G, A, M>) {
   const { modules = {}, state, getters = {}, actions = {}} = options
   const states = createStateSignals(state)  
-  const getters$ = createGetters(states, getters, modules)
+  const getters$ = state.v?.peek() ? createGetters$(states, getters, modules): createGetters(states, getters, modules)
   return { 
     ...createModules(modules),
     ...getters$, 
