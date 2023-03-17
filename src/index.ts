@@ -82,8 +82,8 @@ export function createStateSignals<S>(state: S) {
 
 export function createStore<S, G, A, M>(options: StoreOptions<S & { v?: ReactiveSignal<boolean> }, G, A, M>) {
   const { modules = {}, state, getters = {}, actions = {}} = options
-  const states = createStateSignals(state)  
-  const getters$ = state.v?.peek() ? createGetters$(states, getters, modules): createGetters(states, getters, modules)
+  const states = createStateSignals(state || {})  
+  const getters$ = state?.v?.peek() ? createGetters$(states, getters, modules): createGetters(states, getters, modules)
   return { 
     ...createModules(modules),
     ...getters$, 

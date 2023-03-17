@@ -204,7 +204,8 @@ describe('Store', () => {
 
     const store = createStore({
       state: {
-        fname: signal('')
+        fname: signal(''),
+        v: signal(true)
       },
       modules: {
         core
@@ -285,6 +286,18 @@ describe('Store', () => {
     })
 
     store.setName()
+    expect(store.name.value).toStrictEqual("Jane")
+  })
+
+  it('store without state', () => {
+    const store = createStore({
+      getters: {
+        name() {
+          return 'Jane'
+        }
+      }
+    })
+
     expect(store.name.value).toStrictEqual("Jane")
   })
 

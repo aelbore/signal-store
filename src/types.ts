@@ -56,7 +56,7 @@ export type Modules<M> = {
 }
 
 export interface StoreOptions<S, G, A, M> {
-  state: S
+  state?: S
   modules?: Modules<M>
   getters?: Getters<S, G, M>
   actions?: Actions<S, G, A, M>
