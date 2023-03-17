@@ -26,7 +26,7 @@ export type FPropNames<T> = {
 }[keyof T]
 
 export type State<S> = {
-  [T in keyof S]: Readonly<ReactiveSignal<S[T]>>
+  [T in keyof S]: S[T]
 }
 
 export type Getters<S, G, M> = {
