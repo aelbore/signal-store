@@ -1,4 +1,4 @@
-import { ReactiveSignal, signal } from 'usignal'
+import { signal } from 'usignal'
 import { createStore } from './index'
 
 describe('Store', () => { 
@@ -231,7 +231,7 @@ describe('Store', () => {
 
     const core = createStore({
       state: {
-        name: signal(name),
+        name,
       },
       getters: {
         name(state) {
@@ -255,7 +255,7 @@ describe('Store', () => {
       },
       actions: {
         setName({ state, modules }) {
-          state.fname.value = modules.core.name.value
+          state.fname.value =  modules.core.name.value
         }
       }
     })
@@ -267,8 +267,7 @@ describe('Store', () => {
   it('should call action type', () => {
     const store = createStore({
       state: {
-        name: 'Jane',
-        v: signal(true)
+        name: 'Jane'
       }, 
       getters: {
         name({ state }) {

@@ -3,38 +3,28 @@ import { Action, Actions, Getters, Store, GettersReadOnly, StoreOptions, Modules
 
 export * from './types'
 
+function getFnParams(fn: Function) {
+  const funStr = fn.toString()
+  return funStr.slice(funStr.indexOf('(')+1, funStr.indexOf(')')).match(/([^\s,]+)/g)
+}
+
 function createGetters<S, G, M>(
   state: S, 
   gets: Getters<S, G, M>, 
   modules: Modules<M>
 ) {
   return Object.keys(gets).reduce((p, c) => {
-    p[c] = computed(() => {      
-      return gets[c](state, {
-        getters: createGetters(state, gets, modules),
-        modules
-      })
-    })
-    return p
-  }, {} as  {
-    [K in keyof typeof gets]: Readonly<
-      ReactiveSignal<ReturnType<typeof gets[K]>>
-    >
-  })
-}
-
-function createGetters$<S, G, M>(
-  state: S, 
-  gets: Getters<S, G, M>, 
-  modules: Modules<M>
-) {
-  return Object.keys(gets).reduce((p, c) => {
-    p[c] = computed(() => {      
-      return gets[c]({
+    p[c] = computed(() => {
+      const params = {
         state,
         getters: createGetters(state, gets, modules),
         modules
-      })
+      }
+      const arg$ = getFnParams(gets[c])?.at(0)
+      if (arg$?.includes('state') || arg$?.includes('...')) {
+        return gets[c](state, params)
+      }
+      return gets[c](params)
     })
     return p
   }, {} as  {
@@ -80,10 +70,10 @@ export function createStateSignals<S>(state: S) {
   }, {} as S)
 }
 
-export function createStore<S, G, A, M>(options: StoreOptions<S & { v?: ReactiveSignal<boolean> }, G, A, M>) {
+export function createStore<S, G, A, M>(options: StoreOptions<S, G, A, M>) {
   const { modules = {}, state, getters = {}, actions = {}} = options
   const states = createStateSignals(state || {})  
-  const getters$ = state?.v?.peek() ? createGetters$(states, getters, modules): createGetters(states, getters, modules)
+  const getters$ = createGetters(states, getters, modules)
   return { 
     ...createModules(modules),
     ...getters$, 

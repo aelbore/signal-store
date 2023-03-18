@@ -1,4 +1,4 @@
-import { ReactiveSignal } from 'usignal'
+import { ReactiveSignal, Signal } from 'usignal'
 
 export type Action<A> = {
   [K in keyof A]: <T>(payload?: T) => void
@@ -26,7 +26,10 @@ export type FPropNames<T> = {
 }[keyof T]
 
 export type State<S> = {
-  [T in keyof S]: S[T]
+  [T in keyof S]: 
+    S[T] extends (string | number | boolean | any[])
+      ? ReactiveSignal<S[T]>
+      : S[T]
 }
 
 export type Getters<S, G, M> = {
@@ -39,7 +42,7 @@ export type Getters<S, G, M> = {
         }
       }
     >(
-      state?: S & { state?: State<S>, getters?: V, modules?: X  },
+      state?: State<S> & { state?: State<S>, getters?: V, modules?: X  },
       { getters, modules }?: {
         getters?: V,
         modules?: X
