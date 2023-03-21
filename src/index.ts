@@ -3,11 +3,6 @@ import { Action, Actions, Getters, Store, GettersReadOnly, StoreOptions, Modules
 
 export * from './types'
 
-function getFnParams(fn: Function) {
-  const funStr = fn.toString()
-  return funStr.slice(funStr.indexOf('(')+1, funStr.indexOf(')')).match(/([^\s,]+)/g)
-}
-
 function createGetters<S, G, M>(
   state: S, 
   gets: Getters<S, G, M>, 
@@ -20,11 +15,7 @@ function createGetters<S, G, M>(
         getters: createGetters(state, gets, modules),
         modules
       }
-      const arg$ = getFnParams(gets[c])?.at(0)
-      if (arg$?.includes('state') || arg$?.includes('...')) {
-        return gets[c](state, params)
-      }
-      return gets[c](params)
+      return gets[c]({ ...state, ...params }, params)
     })
     return p
   }, {} as  {
